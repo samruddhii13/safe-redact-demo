@@ -1,0 +1,25 @@
+{
+  "name": "safe-redact-demo",
+  "version": "1.0.0",
+  "description": "Express API demonstrating safe request logging with @samruddhii13/safe-redact",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test 'test/**/*.test.js'"
+  },
+  "keywords": [
+    "safe-redact",
+    "express",
+    "logging",
+    "security",
+    "pii",
+    "sanitization"
+  ],
+  "author": "Samruddhi Meshram",
+  "license": "MIT",
+  "dependencies": {
+    "@samruddhii13/safe-redact": "^1.0.0",
+    "express": "^4.21.2"
+  }
+}
