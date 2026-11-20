@@ -7,7 +7,7 @@ A minimal, secure Express API and interactive web demo showcasing zero-leak requ
 ## Live Demo
 
 A live interactive demo of this project is available at:
-**[LIVE_URL_HERE](LIVE_URL_HERE)**
+**[https://safe-redact-demo.onrender.com](https://safe-redact-demo.onrender.com/)**
 
 Try it directly in your browser: paste or edit any fictional JSON payload containing passwords, tokens, emails, or credit card numbers, click **Redact**, and see immediate safe redaction powered by `@samruddhii13/safe-redact`.
 
