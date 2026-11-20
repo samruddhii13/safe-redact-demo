@@ -41,9 +41,19 @@ export function simulateRequest(app, { method = 'GET', url = '/', headers = {}, 
       ...headers,
     };
 
+    // Provide mock socket to prevent abortSignal/close listener cleanup errors in Node 22/24
+    const socket = new EventEmitter();
+    socket.destroy = () => {};
+    socket.cork = () => {};
+    socket.uncork = () => {};
+    socket.write = () => true;
+
+    req.socket = socket;
+
     const res = new EventEmitter();
     const resHeaders = {};
     res.statusCode = 200;
+    res.socket = socket;
 
     res.setHeader = (key, val) => {
       resHeaders[String(key).toLowerCase()] = val;

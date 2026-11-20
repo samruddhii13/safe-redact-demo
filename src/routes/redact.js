@@ -22,3 +22,4 @@ router.post('/api/redact', (req, res) => {
 });
 
 export default router;
+
