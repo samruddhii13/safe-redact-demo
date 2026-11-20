@@ -3,13 +3,36 @@ import { createRedactor } from '@samruddhii13/safe-redact';
 /**
  * Common API keys and tokens in headers and bodies to redact in addition to defaults.
  */
-const DEFAULT_EXTRA_KEYS = [
+export const DEFAULT_EXTRA_KEYS = [
   'x-api-key',
   'x-auth-token',
   'x-access-token',
   'api-key',
   'token',
 ];
+
+/**
+ * Builds or retrieves a configured redactor instance.
+ *
+ * @param {Object} [options]
+ * @returns {Function}
+ */
+export function buildRedactor(options = {}) {
+  if (options.redactor) {
+    return options.redactor;
+  }
+
+  const redactOptions = {
+    keys: DEFAULT_EXTRA_KEYS,
+    ...(options.redactOptions || {}),
+  };
+
+  if (options.redactOptions?.keys) {
+    redactOptions.keys = [...DEFAULT_EXTRA_KEYS, ...options.redactOptions.keys];
+  }
+
+  return createRedactor(redactOptions);
+}
 
 /**
  * Creates an Express request logging middleware that sanitizes
@@ -23,16 +46,7 @@ const DEFAULT_EXTRA_KEYS = [
  */
 export function createRequestLogger(options = {}) {
   const logger = options.logger || console.log;
-  const redactOptions = {
-    keys: DEFAULT_EXTRA_KEYS,
-    ...(options.redactOptions || {}),
-  };
-
-  if (options.redactOptions?.keys) {
-    redactOptions.keys = [...DEFAULT_EXTRA_KEYS, ...options.redactOptions.keys];
-  }
-
-  const redactor = options.redactor || createRedactor(redactOptions);
+  const redactor = buildRedactor(options);
 
   return function requestLogger(req, res, next) {
     const rawData = {

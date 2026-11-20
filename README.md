@@ -1,6 +1,17 @@
 # safe-redact-demo
 
-A minimal, secure Express API demonstrating zero-leak request logging using the published npm package [`@samruddhii13/safe-redact`](https://www.npmjs.com/package/@samruddhii13/safe-redact).
+A minimal, secure Express API and interactive web demo showcasing zero-leak request logging and redaction using the published npm package [`@samruddhii13/safe-redact`](https://www.npmjs.com/package/@samruddhii13/safe-redact).
+
+---
+
+## Live Demo
+
+A live interactive demo of this project is available at:
+**[LIVE_URL_HERE](LIVE_URL_HERE)**
+
+Try it directly in your browser: paste or edit any fictional JSON payload containing passwords, tokens, emails, or credit card numbers, click **Redact**, and see immediate safe redaction powered by `@samruddhii13/safe-redact`.
+
+> **Note:** Use fake data only. Nothing is stored.
 
 ---
 
@@ -8,7 +19,10 @@ A minimal, secure Express API demonstrating zero-leak request logging using the 
 
 In modern web services, logging raw HTTP requests can inadvertently expose sensitive credentials, authentication tokens, and payment card details to observability sinks, dashboards, and persistent storage.
 
-`safe-redact-demo` showcases how to integrate `@samruddhii13/safe-redact`'s `createRedactor` into an Express request-logging middleware. All incoming HTTP methods, paths, headers, and request bodies are non-destructively sanitized before being written to stdout. The application contains **zero** endpoints or code paths that log or leak raw sensitive data.
+`safe-redact-demo` showcases how to integrate `@samruddhii13/safe-redact`'s `createRedactor` into an Express application.
+- **Request Logging Middleware**: All incoming HTTP methods, paths, headers, and request bodies are non-destructively sanitized before being written to stdout.
+- **Live Redact API (`POST /api/redact`)**: Safely redacts submitted payloads and returns sanitized output without ever logging or returning raw input.
+- **Zero Raw Leaks**: The application contains **zero** endpoints or code paths that log or leak raw sensitive data.
 
 ---
 
@@ -57,7 +71,7 @@ When requests pass through the `createRequestLogger` middleware powered by `crea
 *Benefits:*
 - Deep, non-mutating redaction: route handlers still receive the original values needed to authenticate or charge, but logs never record them.
 - Detects sensitive keys (e.g. `password`, `token`, `cardNumber`, `cvv`, `authorization`, `x-api-key`).
-- Detects sensitive patterns via regex and Luhn algorithm (credit card numbers, Bearer tokens, JWTs, AWS keys).
+- Detects sensitive patterns via regex and Luhn algorithm (credit card numbers, emails, Bearer tokens, JWTs, AWS keys).
 
 ---
 
@@ -86,12 +100,14 @@ npm install @samruddhii13/safe-redact
 npm start
 ```
 
-The API will start listening on port `3000` (or the port defined by `PORT`).
+The API and live demo UI start on port `3000` (or `process.env.PORT`):
 
 ```text
 [safe-redact-demo] Server running at http://localhost:3000
 [safe-redact-demo] All incoming requests are safely redacted prior to logging.
 ```
+
+Open `http://localhost:3000` in your browser to interact with the live redaction playground.
 
 ### Run Tests
 
@@ -105,7 +121,38 @@ npm test
 
 ## API Endpoints & Curl Examples
 
-### 1. `POST /login`
+### 1. `POST /api/redact`
+
+Accepts any JSON payload (limited to 10kb) and returns the sanitized copy.
+
+```bash
+curl -X POST http://localhost:3000/api/redact \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "alex_demo",
+    "email": "alex.smith@example.com",
+    "password": "SuperSecretPassword123!",
+    "token": "tok_live_fictional_98765",
+    "cardNumber": "4111 1111 1111 1111",
+    "cvv": "123"
+  }'
+```
+
+**Response (HTTP 200):**
+```json
+{
+  "username": "alex_demo",
+  "email": "[REDACTED]",
+  "password": "[REDACTED]",
+  "token": "[REDACTED]",
+  "cardNumber": "[REDACTED]",
+  "cvv": "[REDACTED]"
+}
+```
+
+---
+
+### 2. `POST /login`
 
 Accepts authentication payloads with username, password, and tokens.
 
@@ -138,7 +185,7 @@ curl -X POST http://localhost:3000/login \
 
 ---
 
-### 2. `POST /payment`
+### 3. `POST /payment`
 
 Accepts payment details with fictional credit cards (e.g., test numbers like `4111 1111 1111 1111`), CVV, and amounts.
 
@@ -176,7 +223,7 @@ curl -X POST http://localhost:3000/payment \
 
 ---
 
-### 3. `GET /health`
+### 4. `GET /health`
 
 Health check endpoint.
 

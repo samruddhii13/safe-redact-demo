@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Safe Redact — Live Public Demo</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-hover: #0ea5e9;
+      --border: #334155;
+      --accent: #22c55e;
+      --danger: #ef4444;
+      --code-bg: #0b1120;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #ffffff;
+    }
+
+    .badge {
+      display: inline-block;
+      background-color: rgba(56, 189, 248, 0.15);
+      color: var(--primary);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin-bottom: 1rem;
+    }
+
+    .links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .links a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .links a:hover {
+      color: var(--primary-hover);
+      text-decoration: underline;
+    }
+
+    .notice {
+      background-color: rgba(239, 68, 68, 0.1);
+      border-left: 4px solid var(--danger);
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      color: #fca5a5;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .panel {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .panel-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    textarea {
+      width: 100%;
+      height: 320px;
+      background-color: var(--code-bg);
+      color: #e2e8f0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus {
+      border-color: var(--primary);
+    }
+
+    pre {
+      width: 100%;
+      height: 320px;
+      background-color: var(--code-bg);
+      color: #a7f3d0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      overflow: auto;
+      white-space: pre;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    button {
+      background-color: var(--primary);
+      color: #0f172a;
+      border: none;
+      border-radius: 6px;
+      padding: 0.75rem 1.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .status-msg {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .status-msg.error {
+      color: var(--danger);
+    }
+
+    .status-msg.success {
+      color: var(--accent);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge">Live Public Demo</div>
+      <h1>Safe Redact Interactive Playground</h1>
+      <p class="subtitle">Powered by the published package <code>@samruddhii13/safe-redact</code></p>
+      <div class="links">
+        <a href="https://www.npmjs.com/package/@samruddhii13/safe-redact" target="_blank" rel="noopener">📦 View on npm</a>
+        <a href="https://github.com/samruddhii13/safe-redact" target="_blank" rel="noopener">🐙 GitHub Repository</a>
+      </div>
+      <div class="notice">
+        <strong>⚠️ Security Notice:</strong> Use fake data only. Nothing is stored.
+      </div>
+    </header>
+
+    <main>
+      <div class="grid">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Fictional Input JSON</span>
+          </div>
+          <textarea id="jsonInput" spellcheck="false"></textarea>
+          <div class="actions">
+            <button id="redactBtn">Redact</button>
+            <span id="statusMsg" class="status-msg"></span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Redacted Output</span>
+          </div>
+          <pre id="resultBox">Click "Redact" to process the input payload...</pre>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>Demonstrates deep, non-mutating redaction of sensitive keys and strings with <code>@samruddhii13/safe-redact</code>.</p>
+    </footer>
+  </div>
+
+  <script>
+    const samplePayload = {
+      user: "alex_smith",
+      email: "alex.smith@example.com",
+      password: "SuperSecretPassword#2026",
+      token: "tok_live_9a8b7c6d5e4f3a2b1c",
+      cardNumber: "4111 1111 1111 1111",
+      cvv: "345",
+      amount: 149.99,
+      currency: "USD",
+      notes: "Customer contacted via alex.smith@example.com regarding card 4111 1111 1111 1111 payment."
+    };
+
+    const jsonInput = document.getElementById('jsonInput');
+    const resultBox = document.getElementById('resultBox');
+    const redactBtn = document.getElementById('redactBtn');
+    const statusMsg = document.getElementById('statusMsg');
+
+    // Pre-fill textarea with fictional sample JSON
+    jsonInput.value = JSON.stringify(samplePayload, null, 2);
+
+    redactBtn.addEventListener('click', async () => {
+      statusMsg.className = 'status-msg';
+      statusMsg.textContent = 'Processing...';
+
+      let parsedPayload;
+      try {
+        parsedPayload = JSON.parse(jsonInput.value);
+      } catch (err) {
+        statusMsg.className = 'status-msg error';
+        statusMsg.textContent = 'Invalid JSON: ' + err.message;
+        resultBox.textContent = 'Error: The input contains invalid JSON syntax.\nPlease correct the JSON format and try again.';
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/redact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(parsedPayload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          statusMsg.className = 'status-msg error';
+          statusMsg.textContent = data.message || 'Redaction failed';
+          resultBox.textContent = JSON.stringify(data, null, 2);
+          return;
+        }
+
+        statusMsg.className = 'status-msg success';
+        statusMsg.textContent = 'Redacted successfully!';
+        resultBox.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        statusMsg.className = 'status-msg error';
+        statusMsg.textContent = 'Network or request error';
+        resultBox.textContent = 'Error sending request to /api/redact: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

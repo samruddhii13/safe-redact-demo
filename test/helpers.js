@@ -18,12 +18,16 @@ export function simulateRequest(app, { method = 'GET', url = '/', headers = {}, 
       ? (typeof body === 'string' ? body : JSON.stringify(body))
       : null;
 
+    let pushed = false;
     const req = new Readable({
       read() {
-        if (payload) {
-          this.push(payload);
+        if (!pushed) {
+          pushed = true;
+          if (payload) {
+            this.push(payload);
+          }
+          this.push(null);
         }
-        this.push(null);
       },
     });
 
@@ -71,8 +75,6 @@ export function simulateRequest(app, { method = 'GET', url = '/', headers = {}, 
 
     app.handle(req, res, (err) => {
       if (err) reject(err);
-      else res.end();
     });
   });
 }
-
